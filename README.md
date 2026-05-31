@@ -27,7 +27,7 @@ python setup.py develop
 <details>
 <summary><strong>Descriptions</strong> (click) </summary>
 
-For the training set, noise and saturation pixels are synthesized on-the-fly in `GyroDVD_model.py`. Please refer to [RSBlurPipeline](https://github.com/rimchang/GyroDVD/blob/e46d26de434b9dbbf1f9c0aa2376700987e02b40/basicsr/models/GyroDVD_model.py#L310).
+For the training set, noise and saturation pixels are synthesized on-the-fly in `GyroDVD_model.py`. Please refer to [RSBlurPipeline](https://github.com/rimchang/GyroDVD/blob/0c4be0d005d15d195cb67b30c9f74781d1b20cd6/basicsr/models/GyroDVD_model.py#L310).
 
 For the validation and test sets, noise and saturation pixels have already been applied and are included in the released dataset.
 
