@@ -1,0 +1,79 @@
+# ------------------------------------------------------------------------
+# Copyright (c) 2021 megvii-model. All Rights Reserved.
+# ------------------------------------------------------------------------
+# Modified from BasicSR (https://github.com/xinntao/BasicSR)
+# Copyright 2018-2020 BasicSR Authors
+# ------------------------------------------------------------------------
+# general settings
+name: GyroDVD_48_test
+model_type: GyroDVD_test_model
+manual_seed: 0
+num_gpu: auto # 8 * 1 * (23 length)
+reload: true
+retrain: False
+
+network_g:
+  type: GyroDVD_48
+
+datasets:
+  test:
+    name: GyroVD-test
+    phase: 'test'
+    type: GyroVD_dataset
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+    # data loader
+    use_shuffle: false
+    num_worker_per_gpu: 2
+    batch_size_per_gpu: 1
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+    # datasets opt
+    # dir opt
+    dataset_root: 'dataset/GyroVD_Syn_test'
+    dataset_root_tau: 'dataset/GyroVD_Syn_test_tau'
+    datalist: 'datalist/GyroVD_Syn_test.txt'
+
+    load_tau: true
+    RSBlur : false
+    n_sequence: 100
+  
+path:
+  pretrain_network_g: 'model_zoos/GyroDVD_48.pth'
+  strict_load_g: true
+  resume_state: ~
+    
+val:
+  val_freq: 30000
+  save_img: false
+  crop_size: 256
+  max_minibatch: 1
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim:
+      type: ssim_calculate
+
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: 10000
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+    wandb_name: ~
+
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29510
+find_unused_parameters: false

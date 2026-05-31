@@ -1,0 +1,134 @@
+# GENERATE TIME: Thu Mar 28 01:14:04 2024
+# CMD:
+# basicsr/train.py --local_rank=0 -opt options/train/ShiftNet/gopro_rvrt_V13.yml --launcher pytorch
+
+# ------------------------------------------------------------------------
+# Copyright (c) 2021 megvii-model. All Rights Reserved.
+# ------------------------------------------------------------------------
+# Modified from BasicSR (https://github.com/xinntao/BasicSR)
+# Copyright 2018-2020 BasicSR Authors
+# ------------------------------------------------------------------------
+# general settings
+name: GyroDVD_128_train
+model_type: GyroDVD_model
+manual_seed: 0
+num_gpu: auto # 8 * 1 * (23 length)
+reload: true
+retrain: False
+network_g:
+  type: GyroDVD_128
+
+datasets:
+  train:
+    name: GyroVD-train
+    phase: 'train'
+    type: GyroVD_dataset
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+    gt_size: 256
+    boundary_size: 16
+    use_flip: true
+    use_rot: true
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 8
+    batch_size_per_gpu: 1
+    dataset_enlarge_ratio: 5
+    prefetch_mode: ~
+
+    # datasets opt
+    # dir opt
+    dataset_root: 'dataset/GyroVD_Syn_train'
+    dataset_root_tau: 'dataset/GyroVD_Syn_train_tau'
+    datalist: 'datalist/GyroVD_Syn_train.txt'
+
+    load_tau: true
+    RSBlur : true
+    n_sequence: 13
+
+  val:
+    name: GyroVD-test
+    phase: 'val'
+    type: GyroVD_dataset
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+    # data loader
+    use_shuffle: false
+    num_worker_per_gpu: 2
+    batch_size_per_gpu: 1
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+    # datasets opt
+    # dir opt
+    dataset_root: 'dataset/GyroVD_Syn_test'
+    dataset_root_tau: 'dataset/GyroVD_Syn_test_tau'
+    datalist: 'datalist/GyroVD_Syn_test.txt'
+
+    load_tau: true
+    RSBlur : false
+    n_sequence: 12
+  
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+
+train:
+  optim_g:
+    type: Adam
+    lr: !!float 4e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  scheduler:
+    type: TrueCosineAnnealingLR
+    T_max: 600000
+    eta_min: !!float 1e-7
+
+  total_iter: 600000
+  warmup_iter: -1 # no warm up
+
+  # losses
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1
+    reduction: mean
+
+# validation settings
+val:
+  val_freq: 30000
+  save_img: false
+  crop_size: 256
+  max_minibatch: 1
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim:
+      type: ssim_calculate
+
+    
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: 10000
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+    wandb_name: ~
+
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29510
+find_unused_parameters: false
