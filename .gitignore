@@ -1,6 +1,6 @@
 build/
 basicsr.egg-info/
-results/
+results
 tb_logger/
 tb_logger_archived/
 wandb/
@@ -11,6 +11,7 @@ logs/*
 experiments/*
 basicsr/utils/__pycache__/
 options/train/bk
+
 
 run.txt
 __pycache__/
